@@ -71,7 +71,7 @@ export default function Home() {
             {[
               {
                 title: 'Interest starts accruing immediately',
-                body: 'On unsubsidized loans, interest builds while you\'re still in school. By graduation, you already owe more than you borrowed.',
+                body: 'On unsubsidized loans, interest builds while you\'re still in school. A $50,000 loan at 6.54% grows to $64,595 by graduation day — before you make a single payment.',
                 icon: '⏰',
               },
               {
