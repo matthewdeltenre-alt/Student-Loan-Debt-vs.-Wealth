@@ -275,7 +275,13 @@ export default function Calculator() {
               />
               <div className="flex justify-between text-xs text-gray-400 mt-1">
                 <span>3% (conservative)</span>
-                <span>10% (S&amp;P 500 avg)</span>
+                <span className="relative group cursor-help">
+                  10% (S&amp;P 500 avg)
+                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-center leading-relaxed">
+                    The S&P 500 is a basket of the 500 biggest U.S. companies — think Apple, Nike, and Google. Investing in it means owning a tiny slice of all of them. It has averaged ~10% growth per year since 1957.
+                    <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                  </span>
+                </span>
                 <span>12%</span>
               </div>
               <p className="text-xs text-emerald-700 mt-2 font-medium">
