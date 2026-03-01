@@ -4,22 +4,6 @@ export default function Home() {
   return (
     <main className="min-h-screen">
 
-      {/* ── HEADER ── */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex flex-col leading-none">
-            <span className="text-xl font-black tracking-tight text-gray-900 uppercase">The Real Cost</span>
-            <span className="text-xl font-black tracking-tight uppercase">
-              <span className="text-red-600">of Debt</span>
-              <span className="block h-0.5 w-full bg-red-600 mt-0.5 rounded-full" />
-            </span>
-          </div>
-          <span className="text-xs text-gray-400 hidden sm:block text-right leading-relaxed">
-            Student debt vs. wealth.<br />Your numbers. Your choice.
-          </span>
-        </div>
-      </header>
-
       {/* ── HERO ── */}
       <section className="bg-gradient-to-b from-white to-gray-50 border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-14 text-center">
