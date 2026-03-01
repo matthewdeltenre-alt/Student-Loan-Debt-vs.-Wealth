@@ -12,26 +12,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 
-// ── Data ─────────────────────────────────────────────────────────────────────
-// All values indexed to 2015 = 100 for apples-to-apples comparison.
-//
-// Sources:
-//   Car price:       Kelley Blue Book / Cox Automotive avg transaction price reports
-//   Monthly payment: Experian State of the Automotive Finance Market (annual avg)
-//   Household income: U.S. Census Bureau, Real Median Household Income (MEHOINUSA672N)
-
-const RAW = [
-  { year: '2015', carPrice: 33730, payment: 482,  income: 56516 },
-  { year: '2016', carPrice: 34500, payment: 499,  income: 59039 },
-  { year: '2017', carPrice: 35500, payment: 515,  income: 61372 },
-  { year: '2018', carPrice: 36270, payment: 530,  income: 63179 },
-  { year: '2019', carPrice: 37183, payment: 554,  income: 68703 },
-  { year: '2020', carPrice: 38900, payment: 563,  income: 67521 },
-  { year: '2021', carPrice: 43500, payment: 609,  income: 70784 },
-  { year: '2022', carPrice: 48100, payment: 700,  income: 74580 },
-  { year: '2023', carPrice: 47010, payment: 733,  income: 80610 },
-  { year: '2024', carPrice: 48400, payment: 734,  income: 83730 },
-];
+import { AFFORDABILITY_DATA as RAW } from '@/lib/carAffordabilityData';
 
 const BASE = RAW[0];
 const DATA = RAW.map((d) => ({

@@ -1,0 +1,109 @@
+name: Quarterly Data Refresh Reminder
+
+# Runs on the 1st of February, May, August, and November at 9am UTC.
+# February is the most important run — Experian Q4 report drops in Jan/Feb
+# and KBB publishes full-year averages in January.
+on:
+  schedule:
+    - cron: '0 9 1 2,5,8,11 *'
+  workflow_dispatch: # allow manual trigger from GitHub Actions tab
+
+jobs:
+  check-and-remind:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - name: Fetch latest FRED income data
+        id: fred
+        run: |
+          # FRED series MEHOINUSA672N = U.S. Census Bureau Median Household Income
+          # This is a public endpoint — no API key required for basic observation fetch
+          RESPONSE=$(curl -s "https://fred.stlouisfed.org/graph/fredgraph.csv?id=MEHOINUSA672N" | tail -5)
+          echo "fred_recent<<EOF" >> $GITHUB_OUTPUT
+          echo "$RESPONSE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Fetch latest FRED auto loan rate data
+        id: fred_rate
+        run: |
+          # FRED series TERMCBANO — Avg finance rate on new car loans at auto dealers
+          RESPONSE=$(curl -s "https://fred.stlouisfed.org/graph/fredgraph.csv?id=TERMCBANO" | tail -5)
+          echo "fred_rate_recent<<EOF" >> $GITHUB_OUTPUT
+          echo "$RESPONSE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Open reminder issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fredData = `${{ steps.fred.outputs.fred_recent }}`;
+            const fredRateData = `${{ steps.fred_rate.outputs.fred_rate_recent }}`;
+            const today = new Date().toISOString().split('T')[0];
+
+            const body = `## Quarterly data refresh — ${today}
+
+            This issue is opened automatically every quarter as a reminder to update
+            the hardcoded data in \`lib/carAffordabilityData.ts\`.
+
+            ---
+
+            ### ✅ Auto-fetched from FRED (verify these look right)
+
+            **Median Household Income** (FRED: \`MEHOINUSA672N\`)
+            \`\`\`
+            ${fredData}
+            \`\`\`
+            → Update the \`income\` field for the latest year if a new annual value appeared.
+            → Note: Census data for year N is released each September of year N+1.
+
+            **Avg New Car Loan APR** (FRED: \`TERMCBANO\`)
+            \`\`\`
+            ${fredRateData}
+            \`\`\`
+            → This is a quarterly series. Take the Q4 (October) value as the annual figure.
+
+            ---
+
+            ### 🔎 Manual checks required
+
+            These sources don't have free APIs — check their latest reports:
+
+            **1. Avg new vehicle transaction price**
+            - Source: Kelley Blue Book / Cox Automotive
+            - URL: https://mediaroom.kbb.com (search "average transaction price")
+            - When: Full-year average published each January
+            - Update: \`carPrice\` field in \`lib/carAffordabilityData.ts\`
+
+            **2. Avg monthly new car payment**
+            - Source: Experian State of the Automotive Finance Market (Q4 report)
+            - URL: https://www.experian.com/automotive/automotive-credit-reports
+            - When: Q4 report released each February — contains full prior-year average
+            - Update: \`payment\` field in \`lib/carAffordabilityData.ts\`
+
+            ---
+
+            ### 📝 How to update
+
+            1. Open \`lib/carAffordabilityData.ts\`
+            2. Add a new row at the bottom of \`AFFORDABILITY_DATA\` for the new year, or update the most recent year if the data was preliminary
+            3. Commit and push → Vercel redeploys automatically
+
+            \`\`\`ts
+            // Example new row:
+            { year: '2025', carPrice: ???, payment: ???, apr: ???, income: ??? },
+            \`\`\`
+
+            ---
+
+            Close this issue once the data file has been updated.
+            `;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `📊 Quarterly data refresh reminder — ${today}`,
+              body,
+              labels: ['data', 'maintenance'],
+            });
