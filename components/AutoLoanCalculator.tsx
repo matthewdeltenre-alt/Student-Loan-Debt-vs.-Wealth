@@ -222,25 +222,16 @@ function ResultCard({
   label,
   value,
   sub,
-  accent,
 }: {
   label: string;
   value: string;
   sub?: string;
-  accent?: 'red' | 'emerald' | 'amber' | 'blue';
 }) {
-  const colorMap = {
-    red: 'text-red-600',
-    emerald: 'text-emerald-600',
-    amber: 'text-amber-600',
-    blue: 'text-blue-600',
-  };
-  const valueColor = accent ? colorMap[accent] : 'text-gray-900';
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
-      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-1">{label}</div>
-      <div className={`text-2xl font-black ${valueColor}`}>{value}</div>
-      {sub && <div className="text-xs text-gray-400 mt-1">{sub}</div>}
+    <div className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col gap-1">
+      <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</span>
+      <span className="text-xl font-bold text-gray-900">{value}</span>
+      {sub && <span className="text-xs text-gray-400">{sub}</span>}
     </div>
   );
 }
@@ -404,25 +395,21 @@ export default function AutoLoanCalculator() {
                 label="Monthly Payment"
                 value={formatCurrencyFull(monthlyPayment)}
                 sub={`${dtiPercent.toFixed(0)}% of monthly income`}
-                accent={dtiPercent > 15 ? 'red' : 'blue'}
               />
               <ResultCard
                 label="Total Interest"
                 value={formatCurrency(totalInterest)}
                 sub={`Over ${inputs.termMonths} months`}
-                accent="red"
               />
               <ResultCard
                 label="Total Cost of Vehicle"
                 value={formatCurrency(totalCostOfVehicle)}
-                sub={`Price + interest + down payment`}
-                accent="amber"
+                sub="Price + interest + down payment"
               />
               <ResultCard
                 label="Car Value at Payoff"
                 value={formatCurrency(carValueAtPayoff)}
                 sub={`After ${termYears.toFixed(1)} yrs of depreciation`}
-                accent="red"
               />
             </div>
 
