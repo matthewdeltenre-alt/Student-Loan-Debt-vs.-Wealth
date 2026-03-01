@@ -119,12 +119,14 @@ export default function Home() {
           <p className="text-blue-100 text-lg mb-8">
             Before signing any loan, explore every option. The best financial decision is an informed one.
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {[
-              { label: 'Community College', sub: '2 yrs, then transfer' },
-              { label: 'Trade School', sub: 'Electricians earn $90K+' },
-              { label: 'Apprenticeships', sub: 'Earn while you learn' },
-              { label: 'Bootcamps', sub: 'Tech skills in 6 months' },
+              { label: 'State School', sub: 'In-state tuition is 50-70% cheaper than private' },
+              { label: 'Community College', sub: '2 yrs at $5K/yr, then transfer to a 4-year school' },
+              { label: 'Commute from Home', sub: 'Room & board averages $12,000/yr — living at home eliminates it' },
+              { label: 'Trade School', sub: 'Electricians, plumbers & HVAC techs earn $70-100K+' },
+              { label: 'Apprenticeships', sub: 'Earn a salary while you learn a high-demand skill' },
+              { label: 'Bootcamps', sub: 'Land a tech job in 6 months with zero student debt' },
             ].map((alt) => (
               <div key={alt.label} className="bg-blue-500 bg-opacity-60 rounded-xl p-4">
                 <div className="font-bold text-white text-sm">{alt.label}</div>
