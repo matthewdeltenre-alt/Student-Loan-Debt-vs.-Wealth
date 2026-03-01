@@ -336,12 +336,29 @@ function InputRow({
   prefix?: string;
   suffix?: string;
 }) {
+  const [textValue, setTextValue] = useState(String(value));
+  const [focused, setFocused] = useState(false);
+
+  // Keep text in sync with slider when not focused
+  if (!focused && String(value) !== textValue && !textValue.endsWith('.')) {
+    setTextValue(String(value));
+  }
+
   function handleTextChange(e: React.ChangeEvent<HTMLInputElement>) {
     const raw = e.target.value.replace(/[^0-9.]/g, '');
+    setTextValue(raw);
     const num = parseFloat(raw);
     if (!isNaN(num)) {
       onChange({ target: { value: String(Math.min(max, Math.max(min, num))) } } as React.ChangeEvent<HTMLInputElement>);
     }
+  }
+
+  function handleBlur() {
+    setFocused(false);
+    const num = parseFloat(textValue);
+    const clamped = isNaN(num) ? min : Math.min(max, Math.max(min, num));
+    setTextValue(String(clamped));
+    onChange({ target: { value: String(clamped) } } as React.ChangeEvent<HTMLInputElement>);
   }
 
   return (
@@ -352,9 +369,11 @@ function InputRow({
           {prefix && <span className="text-sm text-gray-500">{prefix}</span>}
           <input
             type="text"
-            inputMode="numeric"
-            value={Number(value).toLocaleString()}
+            inputMode="decimal"
+            value={focused ? textValue : Number(value).toLocaleString()}
             onChange={handleTextChange}
+            onFocus={() => { setFocused(true); setTextValue(String(value)); }}
+            onBlur={handleBlur}
             className="w-24 text-right text-sm font-bold text-gray-900 border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {suffix && <span className="text-sm text-gray-500">{suffix}</span>}
