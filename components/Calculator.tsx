@@ -336,13 +336,29 @@ function InputRow({
   prefix?: string;
   suffix?: string;
 }) {
+  function handleTextChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const raw = e.target.value.replace(/[^0-9.]/g, '');
+    const num = parseFloat(raw);
+    if (!isNaN(num)) {
+      onChange({ target: { value: String(Math.min(max, Math.max(min, num))) } } as React.ChangeEvent<HTMLInputElement>);
+    }
+  }
+
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
         <label htmlFor={id} className="text-sm font-medium text-gray-700">{label}</label>
-        <span className="text-sm font-bold text-gray-900">
-          {prefix}{Number(value).toLocaleString()}{suffix}
-        </span>
+        <div className="flex items-center gap-1">
+          {prefix && <span className="text-sm text-gray-500">{prefix}</span>}
+          <input
+            type="text"
+            inputMode="numeric"
+            value={Number(value).toLocaleString()}
+            onChange={handleTextChange}
+            className="w-24 text-right text-sm font-bold text-gray-900 border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {suffix && <span className="text-sm text-gray-500">{suffix}</span>}
+        </div>
       </div>
       <input
         id={id}
