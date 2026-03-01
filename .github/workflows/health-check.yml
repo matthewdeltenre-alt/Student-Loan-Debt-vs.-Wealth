@@ -1,0 +1,46 @@
+name: Daily Health Check
+
+on:
+  schedule:
+    - cron: '0 13 * * *'  # 9am ET / 1pm UTC every day
+  workflow_dispatch:        # Allow manual trigger from GitHub UI
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check site is live
+        run: |
+          echo "Checking collegedebtreality.com..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://www.collegedebtreality.com)
+          if [ "$STATUS" != "200" ]; then
+            echo "FAIL: Site returned HTTP $STATUS"
+            exit 1
+          fi
+          echo "PASS: Site is live (HTTP $STATUS)"
+
+      - name: Check College Scorecard API
+        run: |
+          echo "Checking College Scorecard API..."
+          RESPONSE=$(curl -s "https://api.data.gov/ed/collegescorecard/v1/schools?api_key=${{ secrets.COLLEGE_SCORECARD_API_KEY }}&school.name=Harvard&_fields=school.name&_per_page=1")
+          if echo "$RESPONSE" | grep -q '"school.name"'; then
+            echo "PASS: College Scorecard API is responding"
+          else
+            echo "FAIL: College Scorecard API did not return expected data"
+            echo "Response received: $RESPONSE"
+            exit 1
+          fi
+
+      - name: Check sitemap is accessible
+        run: |
+          echo "Checking sitemap..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://www.collegedebtreality.com/sitemap.xml)
+          if [ "$STATUS" != "200" ]; then
+            echo "FAIL: Sitemap returned HTTP $STATUS"
+            exit 1
+          fi
+          echo "PASS: Sitemap is accessible (HTTP $STATUS)"
+
+      - name: All checks passed
+        run: echo "All systems operational for collegedebtreality.com"
