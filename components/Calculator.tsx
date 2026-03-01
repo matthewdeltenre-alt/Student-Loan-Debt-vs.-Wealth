@@ -248,13 +248,21 @@ export default function Calculator() {
               </div>
             </div>
 
-            <Divider />
+          </div>
 
-            {/* Return rate slider */}
+          {/* ── INVESTMENT ASSUMPTION: separate card inside left column ── */}
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6">
+          <div className="flex items-center gap-2 mb-1">
+              <h2 className="text-lg font-bold text-gray-900">The Alternative: Investing Instead</h2>
+              <span className="bg-emerald-100 text-emerald-700 text-xs font-semibold px-2 py-0.5 rounded-full">What if?</span>
+            </div>
+            <p className="text-sm text-gray-500 mb-4">
+              Instead of paying off loans, what if that money went into the market? Set your expected annual return below.
+            </p>
             <div>
               <div className="flex items-center justify-between mb-1">
-                <h2 className="text-sm font-bold text-gray-900">Expected Annual Return</h2>
-                <span className="text-sm font-bold text-gray-900">{returnRate}%</span>
+                <label className="text-sm font-semibold text-gray-700">Expected Annual Return</label>
+                <span className="text-sm font-bold text-emerald-700">{returnRate}%</span>
               </div>
               <input
                 type="range"
@@ -263,21 +271,21 @@ export default function Calculator() {
                 step={0.5}
                 value={returnRate}
                 onChange={(e) => setReturnRate(Number(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+                className="w-full h-2 bg-emerald-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
               />
               <div className="flex justify-between text-xs text-gray-400 mt-1">
                 <span>3% (conservative)</span>
                 <span>10% (S&amp;P 500 avg)</span>
                 <span>12%</span>
               </div>
-              <p className="text-xs text-gray-400 mt-2">
+              <p className="text-xs text-emerald-700 mt-2 font-medium">
                 {returnRate <= 7
                   ? `${returnRate}% is inflation-adjusted — a conservative, realistic estimate.`
                   : `${returnRate}% reflects the S&P 500 nominal historical average. Not guaranteed.`}
               </p>
             </div>
-
           </div>
+
         </div>
 
         {/* ── RIGHT: RESULTS ── */}
