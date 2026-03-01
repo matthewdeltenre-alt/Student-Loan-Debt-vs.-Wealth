@@ -2,12 +2,12 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'True Cost of College | See What Student Loans Really Cost You',
+  title: 'College Debt Reality | See What Student Loans Really Cost You',
   description:
     'Calculate the real cost of student loans including interest, opportunity cost, and the retirement wealth you forfeit by taking on college debt instead of investing.',
   keywords: [
     'student loan calculator',
-    'true cost of college',
+    'college debt reality',
     'student loan opportunity cost',
     'college debt calculator',
     'should i go to college',
@@ -15,10 +15,10 @@ export const metadata: Metadata = {
     'roth ira vs student loans',
   ],
   openGraph: {
-    title: 'True Cost of College',
+    title: 'College Debt Reality',
     description: 'See what student loans really cost you — including the retirement wealth you\'ll never have.',
     type: 'website',
-    url: 'https://www.truecostofcollege.com',
+    url: 'https://www.collegedebtreality.com',
   },
 };
 

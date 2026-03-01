@@ -8,8 +8,8 @@ export default function Home() {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xl font-black text-gray-900">TrueCost</span>
-            <span className="text-xl font-black text-blue-600">OfCollege</span>
+            <span className="text-xl font-black text-gray-900">CollegeDebt</span>
+            <span className="text-xl font-black text-blue-600">Reality</span>
           </div>
           <span className="text-xs text-gray-400 hidden sm:block">
             A financial reality check for prospective students
@@ -138,7 +138,7 @@ export default function Home() {
       {/* ── FOOTER ── */}
       <footer className="bg-gray-900 text-gray-400 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center space-y-2">
-          <div className="text-white font-bold text-lg">TrueCostOfCollege.com</div>
+          <div className="text-white font-bold text-lg">CollegeDebtReality.com</div>
           <p className="text-sm">
             This tool is for educational purposes only and does not constitute financial advice.
             Calculations use simplified models and historical averages — actual results will vary.
