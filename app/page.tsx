@@ -7,12 +7,15 @@ export default function Home() {
       {/* ── HEADER ── */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl font-black text-gray-900">CollegeDebt</span>
-            <span className="text-xl font-black text-blue-600">Reality</span>
+          <div className="flex flex-col leading-none">
+            <span className="text-xl font-black tracking-tight text-gray-900 uppercase">The Real Cost</span>
+            <span className="text-xl font-black tracking-tight uppercase">
+              <span className="text-red-600">of College</span>
+              <span className="block h-0.5 w-full bg-red-600 mt-0.5 rounded-full" />
+            </span>
           </div>
-          <span className="text-xs text-gray-400 hidden sm:block">
-            A financial reality check for prospective students
+          <span className="text-xs text-gray-400 hidden sm:block text-right leading-relaxed">
+            Student debt vs. wealth.<br />Your numbers. Your choice.
           </span>
         </div>
       </header>
