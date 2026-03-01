@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -13,7 +13,7 @@ import {
 } from 'recharts';
 import { calcMonthlyPayment, fvMonthly, formatCurrency, formatCurrencyFull } from '@/lib/calculations';
 
-// ── Types ──
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 interface AutoInputs {
   vehiclePrice: number;
@@ -24,18 +24,22 @@ interface AutoInputs {
   monthlyIncome: number;
 }
 
+interface FredRate {
+  rate: number;
+  date: string;
+  sourceUrl: string;
+}
+
 interface ChartPoint {
-  age: number;
   label: string;
   investInstead: number;
   carValue: number;
 }
 
-// ── Constants ──
+// ── Constants ─────────────────────────────────────────────────────────────────
 
 const TERM_OPTIONS = [24, 36, 48, 60, 72, 84];
-const DEPRECIATION_RATE = 0.15; // ~15% per year, ~50% loss in 5 years
-const INVEST_RATE = 7; // conservative 7% return for opportunity cost
+const DEPRECIATION_RATE = 0.15;
 
 const DEFAULT_INPUTS: AutoInputs = {
   vehiclePrice: 32000,
@@ -46,33 +50,28 @@ const DEFAULT_INPUTS: AutoInputs = {
   monthlyIncome: 4500,
 };
 
-// ── Chart data ──
+// ── Chart data ────────────────────────────────────────────────────────────────
 
-function calcChartData(inputs: AutoInputs, monthlyPayment: number): ChartPoint[] {
-  const { vehiclePrice, currentAge } = inputs;
+function calcChartData(inputs: AutoInputs, monthlyPayment: number, investRate: number): ChartPoint[] {
+  const { vehiclePrice } = inputs;
   const termYears = inputs.termMonths / 12;
   const data: ChartPoint[] = [];
 
   for (let year = 0; year <= 10; year++) {
-    const age = currentAge + year;
-
-    // Car value after depreciation
     const carValue = vehiclePrice * Math.pow(1 - DEPRECIATION_RATE, year);
 
-    // If monthly payment was invested instead (during loan term, then compounding)
     let investInstead: number;
     if (year <= termYears) {
-      investInstead = fvMonthly(monthlyPayment, INVEST_RATE, year);
+      investInstead = fvMonthly(monthlyPayment, investRate, year);
     } else {
-      const portfolioAtPayoff = fvMonthly(monthlyPayment, INVEST_RATE, termYears);
+      const portfolioAtPayoff = fvMonthly(monthlyPayment, investRate, termYears);
       const yearsAfterPayoff = year - termYears;
       investInstead =
-        portfolioAtPayoff * Math.pow(1 + INVEST_RATE / 100, yearsAfterPayoff) +
-        fvMonthly(monthlyPayment, INVEST_RATE, yearsAfterPayoff);
+        portfolioAtPayoff * Math.pow(1 + investRate / 100, yearsAfterPayoff) +
+        fvMonthly(monthlyPayment, investRate, yearsAfterPayoff);
     }
 
     data.push({
-      age,
       label: year === 0 ? 'Today' : `Yr ${year}`,
       investInstead: Math.round(investInstead),
       carValue: Math.round(carValue),
@@ -82,7 +81,7 @@ function calcChartData(inputs: AutoInputs, monthlyPayment: number): ChartPoint[]
   return data;
 }
 
-// ── Helpers ──
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function formatYAxis(value: number): string {
   if (Math.abs(value) >= 1_000_000) return `$${(value / 1_000_000).toFixed(1)}M`;
@@ -130,6 +129,7 @@ function InputRow({
   step,
   prefix,
   suffix,
+  hint,
 }: {
   label: string;
   id: string;
@@ -140,6 +140,7 @@ function InputRow({
   step: number;
   prefix?: string;
   suffix?: string;
+  hint?: React.ReactNode;
 }) {
   const [textValue, setTextValue] = useState(String(value));
   const [focused, setFocused] = useState(false);
@@ -170,9 +171,7 @@ function InputRow({
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <label htmlFor={id} className="text-sm font-medium text-gray-700">
-          {label}
-        </label>
+        <label htmlFor={id} className="text-sm font-medium text-gray-700">{label}</label>
         <div className="flex items-center gap-1">
           {prefix && <span className="text-sm text-gray-500">{prefix}</span>}
           <input
@@ -180,10 +179,7 @@ function InputRow({
             inputMode="decimal"
             value={focused ? textValue : Number(value).toLocaleString()}
             onChange={handleTextChange}
-            onFocus={() => {
-              setFocused(true);
-              setTextValue(String(value));
-            }}
+            onFocus={() => { setFocused(true); setTextValue(String(value)); }}
             onBlur={handleBlur}
             className="w-24 text-right text-sm font-bold text-gray-900 border border-gray-300 rounded-md px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
@@ -201,32 +197,15 @@ function InputRow({
         className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
       />
       <div className="flex justify-between text-xs text-gray-400 mt-1">
-        <span>
-          {prefix}
-          {min.toLocaleString()}
-          {suffix}
-        </span>
-        <span>
-          {prefix}
-          {max.toLocaleString()}
-          {suffix}
-        </span>
+        <span>{prefix}{min.toLocaleString()}{suffix}</span>
+        <span>{prefix}{max.toLocaleString()}{suffix}</span>
       </div>
+      {hint && <div className="mt-1">{hint}</div>}
     </div>
   );
 }
 
-// ── Result card ──
-
-function ResultCard({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-}) {
+function ResultCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col gap-1">
       <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</span>
@@ -236,10 +215,22 @@ function ResultCard({
   );
 }
 
-// ── Main component ──
+// ── Main component ────────────────────────────────────────────────────────────
 
 export default function AutoLoanCalculator() {
   const [inputs, setInputs] = useState<AutoInputs>(DEFAULT_INPUTS);
+  const [investRate, setInvestRate] = useState(7);
+  const [fredRate, setFredRate] = useState<FredRate | null>(null);
+
+  // Fetch current market rate from FRED on mount
+  useEffect(() => {
+    fetch('/api/auto-rate')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data?.rate) setFredRate(data);
+      })
+      .catch(() => {}); // silently fail — FRED rate is informational only
+  }, []);
 
   function set(field: keyof AutoInputs) {
     return (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -249,6 +240,7 @@ export default function AutoLoanCalculator() {
 
   const loanAmount = Math.max(0, inputs.vehiclePrice - inputs.downPayment);
   const termYears = inputs.termMonths / 12;
+
   const monthlyPayment = useMemo(
     () => calcMonthlyPayment(loanAmount, inputs.interestRate, termYears),
     [loanAmount, inputs.interestRate, termYears]
@@ -259,22 +251,39 @@ export default function AutoLoanCalculator() {
   const totalCostOfVehicle = inputs.downPayment + totalPaid;
   const dtiPercent = inputs.monthlyIncome > 0 ? (monthlyPayment / inputs.monthlyIncome) * 100 : 0;
 
-  // Depreciation: car value at end of loan
   const carValueAtPayoff = inputs.vehiclePrice * Math.pow(1 - DEPRECIATION_RATE, termYears);
   const depreciationLoss = inputs.vehiclePrice - carValueAtPayoff;
 
-  // Opportunity cost: investing monthly payment for term, then continuing to 65
+  // Opportunity cost (driven by user-adjustable investRate)
   const yearsToRetirement = Math.max(0, 65 - inputs.currentAge);
-  const portfolioAtPayoff = fvMonthly(monthlyPayment, INVEST_RATE, termYears);
+  const portfolioAtPayoff = fvMonthly(monthlyPayment, investRate, termYears);
   const yearsAfterPayoff = Math.max(0, yearsToRetirement - termYears);
   const investedAtRetirement =
-    portfolioAtPayoff * Math.pow(1 + INVEST_RATE / 100, yearsAfterPayoff) +
-    fvMonthly(monthlyPayment, INVEST_RATE, yearsAfterPayoff);
+    portfolioAtPayoff * Math.pow(1 + investRate / 100, yearsAfterPayoff) +
+    fvMonthly(monthlyPayment, investRate, yearsAfterPayoff);
 
   const chartData = useMemo(
-    () => calcChartData(inputs, monthlyPayment),
-    [inputs, monthlyPayment]
+    () => calcChartData(inputs, monthlyPayment, investRate),
+    [inputs, monthlyPayment, investRate]
   );
+
+  // FRED rate hint shown below the interest rate slider
+  const fredHint = fredRate ? (
+    <p className="text-xs text-blue-600">
+      Current avg (60-mo new car loan):{' '}
+      <strong>{fredRate.rate.toFixed(2)}%</strong>
+      {' · '}
+      <a
+        href={fredRate.sourceUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline hover:text-blue-800"
+      >
+        Federal Reserve via FRED
+      </a>
+      {' · '}{fredRate.date}
+    </p>
+  ) : null;
 
   return (
     <div className="w-full max-w-7xl mx-auto">
@@ -310,9 +319,7 @@ export default function AutoLoanCalculator() {
                 />
                 <div className="flex items-center justify-between bg-gray-50 rounded-lg px-4 py-3 border border-gray-200">
                   <span className="text-sm font-medium text-gray-600">Loan Amount</span>
-                  <span className="text-base font-black text-gray-900">
-                    {formatCurrencyFull(loanAmount)}
-                  </span>
+                  <span className="text-base font-black text-gray-900">{formatCurrencyFull(loanAmount)}</span>
                 </div>
               </div>
             </div>
@@ -332,9 +339,10 @@ export default function AutoLoanCalculator() {
                   min={0}
                   max={25}
                   step={0.1}
+                  hint={fredHint}
                 />
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Loan Term</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Loan Term</label>
                   <div className="grid grid-cols-3 gap-2">
                     {TERM_OPTIONS.map((months) => (
                       <button
@@ -383,6 +391,60 @@ export default function AutoLoanCalculator() {
             </div>
 
           </div>
+
+          {/* ── OPPORTUNITY COST: separate card below inputs ── */}
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6">
+            <div className="flex items-center gap-2 mb-1">
+              <h2 className="text-lg font-bold text-gray-900">The Alternative: Investing Instead</h2>
+              <span className="bg-emerald-100 text-emerald-700 text-xs font-semibold px-2 py-0.5 rounded-full">What if?</span>
+            </div>
+            <p className="text-sm text-gray-500 mb-4">
+              Instead of making car payments, what if that money went into the market? Set your expected annual return below.
+            </p>
+
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-sm font-semibold text-gray-700">Expected Annual Return</label>
+                <span className="text-sm font-bold text-emerald-700">{investRate}%</span>
+              </div>
+              <input
+                type="range"
+                min={3}
+                max={12}
+                step={0.5}
+                value={investRate}
+                onChange={(e) => setInvestRate(Number(e.target.value))}
+                className="w-full h-2 bg-emerald-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+              />
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <span>3% (conservative)</span>
+                <span className="relative group cursor-help inline-flex items-center gap-1">
+                  10% (S&amp;P 500 avg)
+                  <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-gray-400 text-white font-bold leading-none" style={{ fontSize: '8px' }}>i</span>
+                  <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 text-center leading-relaxed">
+                    The S&P 500 has averaged ~10% growth per year since 1957. Not guaranteed.
+                    <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+                  </span>
+                </span>
+                <span>12%</span>
+              </div>
+              <p className="text-xs text-emerald-700 mt-2 font-medium">
+                {investRate <= 7
+                  ? `${investRate}% is inflation-adjusted — a conservative, realistic estimate.`
+                  : `${investRate}% reflects the S&P 500 nominal historical average. Not guaranteed.`}
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl border border-emerald-200 p-4">
+              <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-1">
+                If invested instead, by age 65
+              </p>
+              <p className="text-3xl font-black text-emerald-700">{formatCurrency(investedAtRetirement)}</p>
+              <p className="text-xs text-emerald-600 mt-1">
+                {formatCurrencyFull(monthlyPayment)}/mo for {inputs.termMonths} months, then compounded to age 65
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* ── RIGHT: RESULTS ── */}
@@ -419,21 +481,12 @@ export default function AutoLoanCalculator() {
               <p className="text-xs text-orange-700 leading-relaxed">
                 You&apos;re paying <strong>{formatCurrencyFull(totalCostOfVehicle)}</strong> for a vehicle
                 that will be worth approximately <strong>{formatCurrency(carValueAtPayoff)}</strong> when
-                you finish paying for it — a loss of <strong>{formatCurrency(depreciationLoss + totalInterest)}</strong> between
+                you finish paying for it — a loss of{' '}
+                <strong>{formatCurrency(depreciationLoss + totalInterest)}</strong> between
                 depreciation and interest.
               </p>
               <p className="text-xs text-orange-600">
                 Cars lose ~15% of value per year. After 5 years, most are worth about half of what you paid.
-              </p>
-            </div>
-
-            {/* Opportunity cost */}
-            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-2">
-              <div className="font-bold text-emerald-900 text-sm">Opportunity Cost</div>
-              <p className="text-xs text-emerald-700 leading-relaxed">
-                If your <strong>{formatCurrencyFull(monthlyPayment)}/mo</strong> payment went into an
-                index fund instead (at 7%/yr), you&apos;d have approximately{' '}
-                <strong>{formatCurrency(investedAtRetirement)}</strong> by age 65.
               </p>
             </div>
 
@@ -475,11 +528,7 @@ export default function AutoLoanCalculator() {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis
-                dataKey="label"
-                tick={{ fontSize: 11, fill: '#6b7280' }}
-                tickLine={false}
-              />
+              <XAxis dataKey="label" tick={{ fontSize: 11, fill: '#6b7280' }} tickLine={false} />
               <YAxis
                 tickFormatter={formatYAxis}
                 tick={{ fontSize: 11, fill: '#6b7280' }}
@@ -515,7 +564,7 @@ export default function AutoLoanCalculator() {
         </div>
 
         <p className="text-xs text-gray-400 mt-3 text-center">
-          Investment assumes {INVEST_RATE}% annual return. Car depreciation assumes ~{(DEPRECIATION_RATE * 100).toFixed(0)}%/year.
+          Investment return rate set above. Car depreciation assumes ~{(DEPRECIATION_RATE * 100).toFixed(0)}%/year.
           This is illustrative, not financial advice.
         </p>
       </div>
