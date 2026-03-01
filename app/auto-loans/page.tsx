@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import AutoLoanCalculator from '@/components/AutoLoanCalculator';
+import CarAffordabilityChart from '@/components/CarAffordabilityChart';
 
 export const metadata: Metadata = {
   title: 'Auto Loan True Cost Calculator | The Real Cost of Debt',
@@ -66,6 +67,13 @@ export default function AutoLoansPage() {
       {/* ── CALCULATOR ── */}
       <section id="calculator" className="py-12 px-4 sm:px-6 lg:px-8">
         <AutoLoanCalculator />
+      </section>
+
+      {/* ── AFFORDABILITY CONTEXT ── */}
+      <section className="bg-white border-t border-gray-200 py-16 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto">
+          <CarAffordabilityChart />
+        </div>
       </section>
 
       {/* ── TIPS SECTION ── */}
