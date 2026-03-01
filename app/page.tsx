@@ -10,7 +10,7 @@ export default function Home() {
           <div className="flex flex-col leading-none">
             <span className="text-xl font-black tracking-tight text-gray-900 uppercase">The Real Cost</span>
             <span className="text-xl font-black tracking-tight uppercase">
-              <span className="text-red-600">of College</span>
+              <span className="text-red-600">of Debt</span>
               <span className="block h-0.5 w-full bg-red-600 mt-0.5 rounded-full" />
             </span>
           </div>
@@ -143,7 +143,7 @@ export default function Home() {
       {/* ── FOOTER ── */}
       <footer className="bg-gray-900 text-gray-400 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center space-y-2">
-          <div className="text-white font-bold text-lg">CollegeDebtReality.com</div>
+          <div className="text-white font-bold text-lg">TheRealCostOfDebt.com</div>
           <p className="text-sm">
             This tool is for educational purposes only and does not constitute financial advice.
             Calculations use simplified models and historical averages — actual results will vary.

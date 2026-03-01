@@ -3,23 +3,24 @@ import Script from 'next/script';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'College Debt Reality | See What Student Loans Really Cost You',
+  title: 'The Real Cost of Debt | See What Your Loans Are Really Costing You',
   description:
-    'Calculate the real cost of student loans including interest, opportunity cost, and the retirement wealth you forfeit by taking on college debt instead of investing.',
+    'Calculate the true cost of student loans, auto loans, and debt — including interest, opportunity cost, and the retirement wealth you forfeit by borrowing instead of investing.',
   keywords: [
+    'real cost of debt calculator',
     'student loan calculator',
-    'college debt reality',
+    'auto loan true cost',
+    'debt vs investing',
     'student loan opportunity cost',
-    'college debt calculator',
-    'should i go to college',
-    'student loan vs investing',
+    'should i take out a loan',
+    'debt vs wealth calculator',
     'roth ira vs student loans',
   ],
   openGraph: {
-    title: 'College Debt Reality',
-    description: 'See what student loans really cost you — including the retirement wealth you\'ll never have.',
+    title: 'The Real Cost of Debt',
+    description: 'See what any loan is really costing you — including the wealth you\'ll never build.',
     type: 'website',
-    url: 'https://www.collegedebtreality.com',
+    url: 'https://www.therealcostofdebt.com',
   },
 };
 

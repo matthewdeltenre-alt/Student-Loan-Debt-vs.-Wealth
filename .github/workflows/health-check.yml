@@ -12,8 +12,8 @@ jobs:
     steps:
       - name: Check site is live
         run: |
-          echo "Checking collegedebtreality.com..."
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://www.collegedebtreality.com)
+          echo "Checking therealcostofdebt.com..."
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://www.therealcostofdebt.com)
           if [ "$STATUS" != "200" ]; then
             echo "FAIL: Site returned HTTP $STATUS"
             exit 1
@@ -35,7 +35,7 @@ jobs:
       - name: Check sitemap is accessible
         run: |
           echo "Checking sitemap..."
-          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://www.collegedebtreality.com/sitemap.xml)
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" https://www.therealcostofdebt.com/sitemap.xml)
           if [ "$STATUS" != "200" ]; then
             echo "FAIL: Sitemap returned HTTP $STATUS"
             exit 1
@@ -43,4 +43,4 @@ jobs:
           echo "PASS: Sitemap is accessible (HTTP $STATUS)"
 
       - name: All checks passed
-        run: echo "All systems operational for collegedebtreality.com"
+        run: echo "All systems operational for therealcostofdebt.com"
