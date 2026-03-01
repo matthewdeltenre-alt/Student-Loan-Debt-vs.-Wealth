@@ -111,16 +111,27 @@ export default function ResultsPanel({ inputs, loan, opportunity }: Props) {
             </p>
           </div>
 
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-            <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-1">
-              Wealth gap vs. investing from age {inputs.currentAge}
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 space-y-3">
+            <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">
+              Retirement wealth comparison
             </p>
-            <p className="text-3xl font-black text-amber-700">
-              {formatCurrency(Math.abs(wealthGap))}
-            </p>
-            <p className="text-xs text-amber-600 mt-1">
-              less at retirement compared to investing instead
-            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-xs text-gray-500">Invest from age {inputs.currentAge}</p>
+                <p className="text-xl font-black text-emerald-600">{formatCurrency(opportunity.totalWealth65Invest)}</p>
+              </div>
+              <div className="text-gray-300 font-light text-2xl">vs</div>
+              <div className="text-right">
+                <p className="text-xs text-gray-500">College path</p>
+                <p className="text-xl font-black text-red-500">{formatCurrency(opportunity.totalWealth65College)}</p>
+              </div>
+            </div>
+            <div className="border-t border-amber-200 pt-2">
+              <p className="text-xs text-amber-800 font-semibold">
+                Taking on this debt means arriving at retirement with{' '}
+                <span className="text-red-600">{formatCurrency(Math.abs(wealthGap))} less</span> than if you had invested that money starting at age {inputs.currentAge}.
+              </p>
+            </div>
           </div>
         </div>
       </div>
