@@ -20,7 +20,7 @@ const DEFAULT_INPUTS: CalcInputs = {
   collegeYears: 4,
   currentAge: 18,
   expectedSalary: 50000,
-  investmentReturnRate: 10,
+  investmentReturnRate: 7,
   noDegreeSalary: 38000,
 };
 
@@ -32,10 +32,9 @@ export default function Calculator() {
   const [selectedMajor, setSelectedMajor] = useState<Major | null>(null);
   const [showMajorPicker, setShowMajorPicker] = useState(false);
   const [inputs, setInputs] = useState<CalcInputs>(DEFAULT_INPUTS);
-  const [returnMode, setReturnMode] = useState<'nominal' | 'real'>('nominal');
+  const [returnRate, setReturnRate] = useState(7);
 
-  const effectiveReturn = returnMode === 'real' ? 7 : 10;
-  const effectiveInputs = { ...inputs, investmentReturnRate: effectiveReturn };
+  const effectiveInputs = { ...inputs, investmentReturnRate: returnRate };
 
   function handleCollegeSelect(college: CollegeResult) {
     setSelectedCollege(college);
@@ -251,27 +250,30 @@ export default function Calculator() {
 
             <Divider />
 
-            {/* Return rate toggle */}
+            {/* Return rate slider */}
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <h2 className="text-sm font-bold text-gray-900">Investment Return Assumption</h2>
-                <div className="flex bg-gray-100 rounded-lg p-0.5">
-                  <button
-                    onClick={() => setReturnMode('nominal')}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${returnMode === 'nominal' ? 'bg-white shadow text-gray-900' : 'text-gray-500'}`}
-                  >
-                    10% (nominal)
-                  </button>
-                  <button
-                    onClick={() => setReturnMode('real')}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${returnMode === 'real' ? 'bg-white shadow text-gray-900' : 'text-gray-500'}`}
-                  >
-                    7% (inflation-adj.)
-                  </button>
-                </div>
+              <div className="flex items-center justify-between mb-1">
+                <h2 className="text-sm font-bold text-gray-900">Expected Annual Return</h2>
+                <span className="text-sm font-bold text-gray-900">{returnRate}%</span>
               </div>
-              <p className="text-xs text-gray-400">
-                S&amp;P 500 has returned ~10% annually since 1957. Inflation-adjusted (~7%) is more conservative.
+              <input
+                type="range"
+                min={3}
+                max={12}
+                step={0.5}
+                value={returnRate}
+                onChange={(e) => setReturnRate(Number(e.target.value))}
+                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              />
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <span>3% (conservative)</span>
+                <span>10% (S&amp;P 500 avg)</span>
+                <span>12%</span>
+              </div>
+              <p className="text-xs text-gray-400 mt-2">
+                {returnRate <= 7
+                  ? `${returnRate}% is inflation-adjusted — a conservative, realistic estimate.`
+                  : `${returnRate}% reflects the S&P 500 nominal historical average. Not guaranteed.`}
               </p>
             </div>
 

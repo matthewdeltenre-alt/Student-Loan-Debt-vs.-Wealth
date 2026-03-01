@@ -125,7 +125,7 @@ export default function NetWorthChart({ data, collegeYears, repaymentYears, curr
       <p className="text-xs text-gray-400 mt-3 text-center">
         Invest path assumes loan payment amount + 15% of income invested from age {currentAge}.
         College path assumes 10% savings while repaying, 20% after debt-free.
-        Both assume {10}% annual return (S&amp;P 500 historical average).
+        Return rate set by user above.
       </p>
     </div>
   );
