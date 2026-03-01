@@ -68,13 +68,13 @@ export default function ResultsPanel({ inputs, loan, opportunity }: Props) {
           label="Monthly Payment"
           value={formatCurrencyFull(monthlyPayment)}
           sub="for the next 10 years"
-          variant="debt"
+          variant="neutral"
         />
         <StatCard
           label="Total Interest Paid"
           value={formatCurrencyFull(totalInterest)}
           sub="money you'll never get back"
-          variant="debt"
+          variant="neutral"
         />
         <StatCard
           label="Debt-Free Age"
@@ -86,7 +86,7 @@ export default function ResultsPanel({ inputs, loan, opportunity }: Props) {
           label="Debt-to-Income"
           value={`${debtToIncomeRatio.toFixed(1)}%`}
           sub={debtToIncomeRatio > 20 ? 'Above recommended 20%' : 'of monthly income'}
-          variant={dtiColor}
+          variant="neutral"
         />
       </div>
 
