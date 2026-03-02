@@ -205,12 +205,25 @@ function InputRow({
   );
 }
 
-function ResultCard({ label, value, sub }: { label: string; value: string; sub?: string }) {
+function ResultCard({ label, value, sub, tooltip }: { label: string; value: string; sub?: string; tooltip?: string }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 flex flex-col gap-1">
       <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</span>
       <span className="text-xl font-bold text-gray-900">{value}</span>
-      {sub && <span className="text-xs text-gray-400">{sub}</span>}
+      {sub && (
+        <span className="text-xs text-gray-400 flex items-center gap-1">
+          {sub}
+          {tooltip && (
+            <span className="relative group cursor-help inline-flex items-center">
+              <span className="inline-flex items-center justify-center w-3.5 h-3.5 rounded-full bg-gray-300 text-white font-bold leading-none flex-shrink-0" style={{ fontSize: '8px' }}>i</span>
+              <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-xs rounded-lg px-3 py-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 leading-relaxed">
+                {tooltip}
+                <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+              </span>
+            </span>
+          )}
+        </span>
+      )}
     </div>
   );
 }
@@ -451,7 +464,8 @@ export default function AutoLoanCalculator() {
               <ResultCard
                 label="Monthly Payment"
                 value={formatCurrencyFull(monthlyPayment)}
-                sub={`${dtiPercent.toFixed(0)}% of monthly income`}
+                sub={`${dtiPercent.toFixed(0)}% of take-home pay`}
+                tooltip="The 20/4/10 rule: put 20% down, finance for no more than 4 years, and keep total car costs (payment + insurance + gas) under 10% of gross income. Since this uses take-home pay, aim to keep your payment alone under 10% — leaving room for insurance and fuel on top."
               />
               <ResultCard
                 label="Total Interest"
@@ -486,12 +500,12 @@ export default function AutoLoanCalculator() {
             </div>
 
             {/* DTI warning */}
-            {dtiPercent > 15 && (
+            {dtiPercent > 10 && (
               <div className="bg-red-50 border border-red-200 rounded-xl p-4">
                 <div className="font-bold text-red-900 text-sm mb-1">High Debt-to-Income Warning</div>
                 <p className="text-xs text-red-700 leading-relaxed">
-                  This payment is <strong>{dtiPercent.toFixed(0)}%</strong> of your monthly income.
-                  Financial advisors recommend keeping total debt payments under 15% of take-home pay.
+                  This payment is <strong>{dtiPercent.toFixed(0)}%</strong> of your take-home pay.
+                  The 20/4/10 rule recommends keeping total car costs under 10% of gross income.
                   Consider a larger down payment, shorter loan, or less expensive vehicle.
                 </p>
               </div>
