@@ -362,34 +362,6 @@ export default function AutoLoanCalculator() {
               </div>
             </div>
 
-            <Divider />
-
-            {/* Personal */}
-            <div>
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Your Situation</h2>
-              <div className="space-y-4">
-                <InputRow
-                  label="Your Age Today"
-                  id="current-age"
-                  value={inputs.currentAge}
-                  onChange={set('currentAge')}
-                  min={16}
-                  max={60}
-                  step={1}
-                />
-                <InputRow
-                  label="Monthly Take-Home Income"
-                  id="monthly-income"
-                  prefix="$"
-                  value={inputs.monthlyIncome}
-                  onChange={set('monthlyIncome')}
-                  min={1000}
-                  max={30000}
-                  step={100}
-                />
-              </div>
-            </div>
-
           </div>
 
           {/* ── OPPORTUNITY COST: separate card below inputs ── */}
@@ -401,6 +373,29 @@ export default function AutoLoanCalculator() {
             <p className="text-sm text-gray-500 mb-4">
               Instead of making car payments, what if that money went into the market? Set your expected annual return below.
             </p>
+
+            {/* Your Situation — drives opportunity cost and DTI */}
+            <div className="space-y-4 mb-6">
+              <InputRow
+                label="Your Age Today"
+                id="current-age"
+                value={inputs.currentAge}
+                onChange={set('currentAge')}
+                min={16}
+                max={60}
+                step={1}
+              />
+              <InputRow
+                label="Monthly Take-Home Income"
+                id="monthly-income"
+                prefix="$"
+                value={inputs.monthlyIncome}
+                onChange={set('monthlyIncome')}
+                min={1000}
+                max={30000}
+                step={100}
+              />
+            </div>
 
             <div className="mb-4">
               <div className="flex items-center justify-between mb-1">
