@@ -1,16 +1,27 @@
 import { NextResponse } from 'next/server';
 
+// Revalidate this route every 24 hours — FRED data updates monthly
+export const revalidate = 86400;
+
 // FRED series: Finance Rate on Consumer Installment Loans at Commercial Banks
 // New Autos, 60-Month Loan — updated monthly by the Federal Reserve
 // https://fred.stlouisfed.org/series/RIFLPBCIANM60NM
 const FRED_SERIES = 'RIFLPBCIANM60NM';
 
 export async function GET() {
-  const apiKey = process.env.FRED_API_KEY;
+  const apiKey = process.env.FRED_API_KEY?.trim();
 
   if (!apiKey) {
     return NextResponse.json(
       { error: 'FRED_API_KEY not configured' },
+      { status: 500 }
+    );
+  }
+
+  // FRED API keys are exactly 32 alphanumeric characters
+  if (apiKey.length !== 32) {
+    return NextResponse.json(
+      { error: `API key looks wrong — expected 32 chars, got ${apiKey.length}` },
       { status: 500 }
     );
   }
@@ -24,10 +35,8 @@ export async function GET() {
     `&limit=5`;
 
   try {
-    const res = await fetch(url, {
-      // cache: revalidate every 24h — rate only updates monthly
-      next: { revalidate: 86400 },
-    });
+    // No fetch-level cache — let Next.js route revalidation handle caching
+    const res = await fetch(url, { cache: 'no-store' });
 
     if (!res.ok) {
       const body = await res.text().catch(() => '');
