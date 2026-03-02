@@ -15,29 +15,41 @@ export async function GET() {
     );
   }
 
-  try {
-    // Fetch the 5 most recent observations — FRED sometimes returns "." for
-    // the latest period before it's published, so we scan for the first real value.
-    const res = await fetch(
-      `https://api.stlouisfed.org/fred/series/observations` +
-        `?series_id=${FRED_SERIES}` +
-        `&api_key=${apiKey}` +
-        `&file_type=json` +
-        `&sort_order=desc` +
-        `&limit=5`,
-      { next: { revalidate: 86400 } } // cache 24 hours — rate only updates monthly
-    );
+  const url =
+    `https://api.stlouisfed.org/fred/series/observations` +
+    `?series_id=${FRED_SERIES}` +
+    `&api_key=${apiKey}` +
+    `&file_type=json` +
+    `&sort_order=desc` +
+    `&limit=5`;
 
-    if (!res.ok) throw new Error(`FRED responded ${res.status}`);
+  try {
+    const res = await fetch(url, {
+      // cache: revalidate every 24h — rate only updates monthly
+      next: { revalidate: 86400 },
+    });
+
+    if (!res.ok) {
+      const body = await res.text().catch(() => '');
+      return NextResponse.json(
+        { error: `FRED responded ${res.status}`, detail: body.slice(0, 300) },
+        { status: 502 }
+      );
+    }
 
     const data = await res.json();
     const observations: Array<{ date: string; value: string }> =
       data.observations ?? [];
 
-    // Find the most recent observation with an actual value
+    // FRED sometimes returns "." for the latest period before it's published
     const latest = observations.find((o) => o.value !== '.');
 
-    if (!latest) throw new Error('No recent value available');
+    if (!latest) {
+      return NextResponse.json(
+        { error: 'No recent value available', observations },
+        { status: 502 }
+      );
+    }
 
     return NextResponse.json({
       rate: parseFloat(latest.value),
@@ -48,6 +60,9 @@ export async function GET() {
       sourceUrl: `https://fred.stlouisfed.org/series/${FRED_SERIES}`,
     });
   } catch (err) {
-    return NextResponse.json({ error: String(err) }, { status: 502 });
+    return NextResponse.json(
+      { error: String(err), url: url.replace(apiKey, '***') },
+      { status: 502 }
+    );
   }
 }
